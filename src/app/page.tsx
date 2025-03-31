@@ -10,15 +10,15 @@ export default function Home() {
         <Logo variant="white" />
         <div className="flex gap-4">
           <Link href="/login">
-            <Button variant="ghost" className="text-white hover:text-amber-400">
-              Login
+            <Button variant="ghost" className=" cursor-pointer text-white hover:text-black">
+              Login 
             </Button>
           </Link>
           <Link href="/signup">
-            <Button className="bg-amber-500 hover:bg-amber-600 text-black">Sign Up</Button>
+            <Button className="cursor-pointer bg-amber-500 hover:bg-amber-600 text-black">Sign Up</Button>
           </Link>
           <Link href="/admin/login">
-            <Button variant="outline" className="text-white border-white hover:bg-slate-700">
+            <Button variant="outline" className="cursor-pointer text-black border-blue-200 hover:bg-slate-200">
               <Shield className="mr-2 h-4 w-4" />
               Admin
             </Button>
@@ -38,12 +38,12 @@ export default function Home() {
             </p>
             <div className="flex gap-4 pt-4">
               <Link href="/signup">
-                <Button size="lg" className="bg-amber-500 hover:bg-amber-600 text-black">
+                <Button size="lg" className="cursor-pointer bg-amber-500 hover:bg-green-200 text-black">
                   Get Started
                 </Button>
               </Link>
               <Link href="/about">
-                <Button size="lg" variant="outline" className="text-white border-white hover:bg-slate-700">
+                <Button size="lg" variant="outline" className="cursor-pointer text-black border-slate-400 hover:bg-slate-300">
                   Learn More
                 </Button>
               </Link>
@@ -52,11 +52,42 @@ export default function Home() {
           <div className="relative">
             <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg blur opacity-75"></div>
             <div className="relative bg-slate-800 p-6 rounded-lg border border-slate-700">
-              <img
-                src="/placeholder.svg?height=400&width=600"
-                alt="Construction planning visualization"
-                className="rounded-md w-full h-auto"
-              />
+            <svg
+  width="600"
+  height="400"
+  viewBox="0 0 600 400"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  className="rounded-md w-full h-auto"
+>
+
+  <rect width="600" height="400" fill="#F4F4F4" />
+
+
+  <rect x="50" y="250" width="500" height="100" fill="#E0E0E0" />
+  <rect x="70" y="230" width="60" height="20" fill="#BDBDBD" />
+  <rect x="150" y="220" width="80" height="30" fill="#9E9E9E" />
+
+  <rect x="450" y="100" width="10" height="200" fill="#B0BEC5" />
+  <rect x="460" y="100" width="120" height="10" fill="#B0BEC5" />
+  <line x1="580" y1="110" x2="520" y2="200" stroke="#B0BEC5" strokeWidth="3" />
+  <rect x="510" y="200" width="20" height="40" fill="#FFC107" />
+
+
+  <rect x="200" y="150" width="100" height="150" fill="#90A4AE" />
+  <rect x="320" y="170" width="80" height="130" fill="#78909C" />
+  <rect x="450" y="140" width="60" height="160" fill="#607D8B" />
+
+  <rect x="210" y="170" width="10" height="10" fill="white" />
+  <rect x="230" y="170" width="10" height="10" fill="white" />
+  <rect x="210" y="190" width="10" height="10" fill="white" />
+  <rect x="230" y="190" width="10" height="10" fill="white" />
+
+  <rect x="0" y="350" width="600" height="50" fill="#8D6E63" />
+  <rect x="0" y="370" width="600" height="20" fill="#757575" />
+  <line x1="0" y1="380" x2="600" y2="380" stroke="white" strokeDasharray="10,10" strokeWidth="2" />
+</svg>
+
             </div>
           </div>
         </div>

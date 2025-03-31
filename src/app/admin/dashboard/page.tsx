@@ -14,6 +14,7 @@ import {
   Layers,
   RefreshCw,
   Shield,
+  User,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,10 +35,9 @@ import { AdminSidebar } from "@/components/admin-sidebar"
 import { AdminUserDetailsDialog } from "@/components/admin-user-details-dialog"
 import { AdminQueryDetailsDialog } from "@/components/admin-query-details-dialog"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { AdminRealTimeStats } from "@/components/admin-real-time-stats"
 
 // Define types for our data structures
-interface User {
+interface UserType {
   _id: string
   username: string
   email: string
@@ -100,14 +100,51 @@ interface Stats {
   newProjects?: number
 }
 
+// Define props for AdminRealTimeStats
+interface AdminRealTimeStatsProps {
+  initialStats: Stats
+}
+
+// AdminRealTimeStats Component
+const AdminRealTimeStats: React.FC<AdminRealTimeStatsProps> = ({ initialStats }) => {
+  return (
+    <Card className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm border border-slate-200 dark:border-slate-700">
+      <CardHeader>
+        <CardTitle>Real-Time Statistics</CardTitle>
+        <CardDescription>Live platform metrics</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Total Users</p>
+            <p className="text-2xl font-bold">{initialStats.totalUsers}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Total Queries</p>
+            <p className="text-2xl font-bold">{initialStats.totalQueries}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Active Users</p>
+            <p className="text-2xl font-bold">{initialStats.activeUsers}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Total Projects</p>
+            <p className="text-2xl font-bold">{initialStats.totalProjects}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
 export default function AdminDashboardPage() {
   const router = useRouter()
   const [isAdmin, setIsAdmin] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
-  const [users, setUsers] = useState<User[]>([])
+  const [users, setUsers] = useState<UserType[]>([])
   const [queries, setQueries] = useState<Query[]>([])
   const [projects, setProjects] = useState<Project[]>([])
-  const [filteredUsers, setFilteredUsers] = useState<User[]>([])
+  const [filteredUsers, setFilteredUsers] = useState<UserType[]>([])
   const [filteredQueries, setFilteredQueries] = useState<Query[]>([])
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -123,7 +160,7 @@ export default function AdminDashboardPage() {
     totalFloorPlans: 0,
     conversionRateChange: 0,
   })
-  const [selectedUser, setSelectedUser] = useState<User | null>(null)
+  const [selectedUser, setSelectedUser] = useState<UserType | null>(null)
   const [selectedQuery, setSelectedQuery] = useState<Query | null>(null)
   const [isUserDetailsOpen, setIsUserDetailsOpen] = useState(false)
   const [isQueryDetailsOpen, setIsQueryDetailsOpen] = useState(false)
@@ -141,7 +178,8 @@ export default function AdminDashboardPage() {
         setIsAdmin(true)
         fetchData()
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("Admin check error:", err)
       setAuthError(true)
       router.push("/admin/login")
     }
@@ -209,8 +247,8 @@ export default function AdminDashboardPage() {
       } else {
         console.error("Failed to fetch stats")
       }
-    } catch (error) {
-      console.error("Error fetching admin data:", error)
+    } catch (err) {
+      console.error("Error fetching admin data:", err)
       toast.error("Failed to load data", {
         description: "Please try again later.",
       })
@@ -222,7 +260,6 @@ export default function AdminDashboardPage() {
 
   // Filter users, queries, and projects based on search term and time filter
   useEffect(() => {
-    // Apply search filter
     let filteredU = users
     let filteredQ = queries
     let filteredP = projects
@@ -248,7 +285,6 @@ export default function AdminDashboardPage() {
       )
     }
 
-    // Apply time filter
     if (timeFilter !== "all") {
       const now = new Date()
       const cutoffDate = new Date()
@@ -277,7 +313,7 @@ export default function AdminDashboardPage() {
     setFilteredProjects(filteredP)
   }, [searchTerm, timeFilter, users, queries, projects])
 
-  const handleViewUserDetails = (user: User) => {
+  const handleViewUserDetails = (user: UserType) => {
     setSelectedUser(user)
     setIsUserDetailsOpen(true)
   }
@@ -295,7 +331,7 @@ export default function AdminDashboardPage() {
         const url = window.URL.createObjectURL(blob)
         const a = document.createElement("a")
         a.href = url
-        a.download = `buildwise-data-${format(new Date(), "yyyy-MM-dd")}.csv`
+        a.download = `constructhub-data-${format(new Date(), "yyyy-MM-dd")}.csv`
         document.body.appendChild(a)
         a.click()
         window.URL.revokeObjectURL(url)
@@ -312,7 +348,8 @@ export default function AdminDashboardPage() {
           description: "Failed to export data. Please try again.",
         })
       }
-    } catch (error) {
+    } catch (err) {
+      console.error("Export error:", err)
       toast.error("Export failed", {
         description: "An error occurred while exporting data.",
       })
@@ -327,7 +364,7 @@ export default function AdminDashboardPage() {
   }
 
   if (authError) {
-    return null // Don't render anything if there's an auth error, we'll redirect
+    return null
   }
 
   if (!isAdmin) {
@@ -358,7 +395,7 @@ export default function AdminDashboardPage() {
               <h1 className="text-3xl font-bold bg-gradient-to-r from-amber-600 to-amber-400 bg-clip-text text-transparent">
                 Admin Dashboard
               </h1>
-              <p className="text-slate-600 dark:text-slate-400 mt-1">Monitor and manage BuildWise AI platform data</p>
+              <p className="text-slate-600 dark:text-slate-400 mt-1">Monitor and manage ConstructHub platform data</p>
             </div>
 
             <div className="flex items-center gap-4">
@@ -621,7 +658,17 @@ export default function AdminDashboardPage() {
                             <TableRow key={project._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                               <TableCell className="font-medium">{project._id.toString().substring(0, 6)}...</TableCell>
                               <TableCell>{project.name}</TableCell>
-                              <TableCell>{project.username || "Unknown"}</TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2">
+                                  <div className="h-8 w-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center">
+                                    <User className="h-4 w-4 text-slate-500" />
+                                  </div>
+                                  <div>
+                                    <div>{project.username || "Unknown"}</div>
+                                    <div className="text-xs text-slate-500">{project.userEmail}</div>
+                                  </div>
+                                </div>
+                              </TableCell>
                               <TableCell>
                                 {project.city}, {project.state}
                               </TableCell>
@@ -748,4 +795,3 @@ export default function AdminDashboardPage() {
     </div>
   )
 }
-
