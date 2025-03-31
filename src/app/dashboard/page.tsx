@@ -52,12 +52,16 @@ interface Stats {
 }
 
 export default function DashboardPage() {
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push("/login")
+    },
+  })
+  
   const router = useRouter()
-  const [isNewProjectOpen, setIsNewProjectOpen] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])
-  const [recentActivity, setRecentActivity] = useState<Activity[]>([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [activities, setActivities] = useState<Activity[]>([])
   const [stats, setStats] = useState<Stats>({
     totalProjects: 0,
     aiConsultations: 0,
@@ -66,13 +70,8 @@ export default function DashboardPage() {
     designersContacted: 0,
     lastActive: new Date().toISOString(),
   })
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login")
-    }
-  }, [status, router])
+  const [isLoading, setIsLoading] = useState(true)
+  const [showNewProjectDialog, setShowNewProjectDialog] = useState(false)
 
   // Fetch user projects and activity
   useEffect(() => {
@@ -98,7 +97,7 @@ export default function DashboardPage() {
           const activityResponse = await fetch("/api/user/activity")
           if (activityResponse.ok) {
             const activityData = await activityResponse.json()
-            setRecentActivity(activityData.activities || [])
+            setActivities(activityData.activities || [])
 
             // Calculate stats from activity
             const aiChats = activityData.activities?.filter((a: Activity) => a.type === "ai_chat").length || 0
@@ -150,7 +149,7 @@ export default function DashboardPage() {
         toast.success("Project created", {
           description: "Your new project has been created successfully.",
         })
-        setIsNewProjectOpen(false)
+        setShowNewProjectDialog(false)
       } else {
         const error = await response.json()
         toast.error("Failed to create project", {
@@ -196,7 +195,7 @@ export default function DashboardPage() {
               </p>
             </div>
             <Button
-              onClick={() => setIsNewProjectOpen(true)}
+              onClick={() => setShowNewProjectDialog(true)}
               className="bg-gradient-to-r from-amber-600 to-amber-400 hover:from-amber-700 hover:to-amber-500 text-white shadow-lg hover:shadow-xl transition-all"
               size="lg"
             >
@@ -349,7 +348,7 @@ export default function DashboardPage() {
                       plans, materials, and local designers.
                     </p>
                     <Button
-                      onClick={() => setIsNewProjectOpen(true)}
+                      onClick={() => setShowNewProjectDialog(true)}
                       className="bg-gradient-to-r from-amber-600 to-amber-400 hover:from-amber-700 hover:to-amber-500 text-white"
                       size="lg"
                     >
@@ -368,7 +367,7 @@ export default function DashboardPage() {
                   <CardDescription>Your recent actions and interactions with BuildWise AI</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <RecentActivityList activities={recentActivity} />
+                  <RecentActivityList activities={activities} />
                 </CardContent>
                 <CardFooter className="flex justify-center border-t pt-6">
                   <Button
@@ -434,7 +433,7 @@ export default function DashboardPage() {
                           onClick={() =>
                             projects.length > 0
                               ? router.push(`/dashboard/projects/${projects[0]._id}?tab=floorplan`)
-                              : setIsNewProjectOpen(true)
+                              : setShowNewProjectDialog(true)
                           }
                           className="w-full bg-green-600 hover:bg-green-700 text-white"
                         >
@@ -462,7 +461,7 @@ export default function DashboardPage() {
                           onClick={() =>
                             projects.length > 0
                               ? router.push(`/dashboard/projects/${projects[0]._id}?tab=materials`)
-                              : setIsNewProjectOpen(true)
+                              : setShowNewProjectDialog(true)
                           }
                           className="w-full bg-purple-600 hover:bg-purple-700 text-white"
                         >
@@ -490,7 +489,7 @@ export default function DashboardPage() {
                           onClick={() =>
                             projects.length > 0
                               ? router.push(`/dashboard/projects/${projects[0]._id}?tab=designers`)
-                              : setIsNewProjectOpen(true)
+                              : setShowNewProjectDialog(true)
                           }
                           className="w-full bg-amber-600 hover:bg-amber-700 text-white"
                         >
@@ -506,7 +505,7 @@ export default function DashboardPage() {
         </main>
       </div>
 
-      <NewProjectDialog open={isNewProjectOpen} onOpenChange={setIsNewProjectOpen} onSubmit={handleCreateProject} />
+      <NewProjectDialog open={showNewProjectDialog} onOpenChange={setShowNewProjectDialog} onSubmit={handleCreateProject} />
     </div>
   )
 }

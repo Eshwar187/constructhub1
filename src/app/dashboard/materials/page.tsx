@@ -132,8 +132,11 @@ export default function MaterialsPage() {
 
           {projects.length > 0 && selectedProject ? (
             <RealTimeMaterials
-              state={selectedProject.state}
-              city={selectedProject.city}
+              location={{
+                type: "local",
+                city: selectedProject.city,
+                state: selectedProject.state
+              }}
               budget={selectedProject.budget}
             />
           ) : (

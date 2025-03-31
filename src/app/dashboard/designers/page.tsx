@@ -23,18 +23,17 @@ interface Project {
 }
 
 export default function DesignersPage() {
-  const { data: session, status } = useSession()
+  const { data: session, status } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push("/login")
+    },
+  })
+  
   const router = useRouter()
   const [projects, setProjects] = useState<Project[]>([])
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login")
-    }
-  }, [status, router])
 
   // Fetch user projects
   useEffect(() => {
@@ -146,8 +145,11 @@ export default function DesignersPage() {
               </CardHeader>
               <CardContent>
                 <RealTimeDesigners
-                  city={selectedProject.city}
-                  state={selectedProject.state}
+                  location={{
+                    type: "local",
+                    city: selectedProject.city,
+                    state: selectedProject.state
+                  }}
                   budget={selectedProject.budgetCategory || "medium"}
                   onConnect={handleDesignerConnect}
                 />

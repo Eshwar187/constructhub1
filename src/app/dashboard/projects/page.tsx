@@ -28,7 +28,13 @@ interface Project {
 }
 
 export default function ProjectsPage() {
-  const { data: session, status } = useSession()
+  const { data: session, status, update } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push("/login")
+    },
+  })
+  
   const router = useRouter()
   const [isNewProjectOpen, setIsNewProjectOpen] = useState(false)
   const [projects, setProjects] = useState<Project[]>([])
@@ -38,13 +44,6 @@ export default function ProjectsPage() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [sortBy, setSortBy] = useState("createdAt")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login")
-    }
-  }, [status, router])
 
   // Fetch user projects
   useEffect(() => {

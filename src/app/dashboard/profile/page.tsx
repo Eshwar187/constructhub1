@@ -45,19 +45,17 @@ const passwordFormSchema = z
   })
 
 export default function ProfilePage() {
-  const { data: session, status, update } = useSession()
+  const { data: session, status, update } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push("/login")
+    },
+  })
   const router = useRouter()
   const [isProfileSubmitting, setIsProfileSubmitting] = useState(false)
   const [isPasswordSubmitting, setIsPasswordSubmitting] = useState(false)
   const [userData, setUserData] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login")
-    }
-  }, [status, router])
 
   // Fetch user data
   useEffect(() => {

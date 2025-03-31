@@ -57,7 +57,13 @@ const preferencesFormSchema = z.object({
 })
 
 export default function SettingsPage() {
-  const { data: session, status, update } = useSession()
+  const { data: session, status, update } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push("/login")
+    },
+  })
+  
   const router = useRouter()
   const [isSaving, setIsSaving] = useState(false)
   const [userProfile, setUserProfile] = useState<any>(null)
@@ -73,13 +79,6 @@ export default function SettingsPage() {
     securityAlerts: true,
     marketingEmails: false,
   })
-
-  // Redirect if not authenticated
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      router.push("/login")
-    }
-  }, [status, router])
 
   // Fetch user profile
   useEffect(() => {
